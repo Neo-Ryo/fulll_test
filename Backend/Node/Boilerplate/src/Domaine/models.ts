@@ -1,54 +1,103 @@
-import { randomUUID } from 'crypto'
+import { prisma } from '../prisma'
 
 export class User {
-    user_uuid: string
-    constructor() {
-        this.user_uuid = randomUUID()
+    id: number
+    constructor(id: number) {
+        this.id = id
     }
-}
-export class Fleet {
-    uuid: string
-    user: User
-    vehicules: Vehicule[]
-    constructor(user: User) {
-        this.uuid = randomUUID()
-        this.user = user
-        this.vehicules = []
-    }
-
-    registerVehicule(vehicule: Vehicule) {
-        if (this.vehicules.find((v) => v.plate === vehicule.plate)) {
-            return 'Vehicule already registered'
+    async save() {
+        let user = await prisma.user.findUnique({ where: { id: this.id } })
+        if (!user) {
+            user = await prisma.user.create({ data: { id: this.id } })
         }
-        this.vehicules.push(vehicule)
-        return this.vehicules
+        return user
     }
 }
 
-export type Location = { lat: string; lon: string }
+export type Location = { latitude: string; longitude: string }
 export type VehiculeType = 'moto' | 'car' | 'truck'
 export class Vehicule {
-    type: VehiculeType
-    plate: string
-    location?: Location
-    constructor(
-        type: VehiculeType,
-        plate: string,
-        location: Location | undefined
-    ) {
-        this.type = type
-        this.plate = plate
-        this.location = location
+    async save(plate: string, type: VehiculeType, location?: Location) {
+        let vehicule = await prisma.vehicule.findUnique({
+            where: { plate: plate },
+        })
+        if (!vehicule) {
+            vehicule = await prisma.vehicule.create({
+                data: {
+                    type: type,
+                    plate: plate,
+                    latitude: location?.latitude,
+                    longitude: location?.longitude,
+                },
+            })
+        }
+        return vehicule
     }
 
-    parkVehicule(location: Location) {
+    async get(plate: string) {
+        return await prisma.vehicule.findUnique({ where: { plate } })
+    }
+
+    async parkVehicule(plate: string, location: Location) {
+        let vehicule = await this.get(plate)
+        if (!vehicule) {
+            return 'Unregistered vehicule'
+        }
         if (
-            this.location?.lat === location.lat &&
-            this.location.lon === location.lon
+            location.latitude === vehicule.latitude &&
+            location.longitude === vehicule.longitude
         ) {
             return 'Vehicle is already parked at this location'
         }
-        this.location = location
-        return this.location
+
+        vehicule = await prisma.vehicule.update({
+            where: { plate },
+            data: {
+                longitude: location.longitude,
+                latitude: location.latitude,
+            },
+        })
+        return vehicule
+    }
+}
+
+export class Fleet {
+    async save(userId: number) {
+        let fleet = await prisma.fleet.findUnique({
+            where: { owner_id: userId },
+        })
+        if (!fleet) {
+            fleet = await prisma.fleet.create({
+                data: { owner_id: userId },
+            })
+        }
+        return fleet
+    }
+
+    async registerVehicule(fleetId: number, vehiculePlateNumber: string) {
+        let fleet = await prisma.fleet.findUnique({
+            where: { id: fleetId },
+            include: { vehicules: true },
+        })
+        if (!fleet) {
+            return 'Fleet not found'
+        }
+        if (fleet.vehicules.find((v) => v.plate === vehiculePlateNumber)) {
+            return 'Vehicule already registered'
+        }
+        let vehicule_db = await prisma.vehicule.findUnique({
+            where: { plate: vehiculePlateNumber },
+        })
+        if (!vehicule_db) {
+            vehicule_db = await new Vehicule().save(vehiculePlateNumber, 'car')
+        }
+        fleet = await prisma.fleet.update({
+            where: { id: fleetId },
+            data: {
+                vehicules: { set: vehicule_db },
+            },
+            include: { vehicules: true },
+        })
+        return fleet
     }
 }
