@@ -10,23 +10,23 @@ const {
     registerVehiculeToFleet,
 } = require('./build/App/controllers/fleetController')
 
-const pathToFleetController = 'build/App/controllers/fleetController.js'
-const pathToUserController = 'build/App/controllers/userController.js'
-const pathToVehiculeController = 'build/App/controllers/vehiculeController.js'
+// const pathToFleetController = 'build/App/controllers/fleetController.js'
+// const pathToUserController = 'build/App/controllers/userController.js'
+// const pathToVehiculeController = 'build/App/controllers/vehiculeController.js'
 
-function checkBuildFolder() {
-    if (!fs.existsSync('build/')) {
-        return false
-    }
-    const filesExists =
-        fs.existsSync(pathToUserController) &&
-        fs.existsSync(pathToFleetController) &&
-        fs.existsSync(pathToVehiculeController)
-    if (!filesExists) {
-        return false
-    }
-    return true
-}
+// function checkBuildFolder() {
+//     if (!fs.existsSync('build/')) {
+//         return false
+//     }
+//     const filesExists =
+//         fs.existsSync(pathToUserController) &&
+//         fs.existsSync(pathToFleetController) &&
+//         fs.existsSync(pathToVehiculeController)
+//     if (!filesExists) {
+//         return false
+//     }
+//     return true
+// }
 
 const program = new Command()
 
@@ -40,16 +40,13 @@ program
     .description('Create a new fleet for a user')
     .argument('<userId>', 'user id')
     .action(async (str) => {
-        if (!checkBuildFolder()) {
-            console.log('run yarn build before use that command')
-            return
-        }
         if (Number.isNaN(Number(str))) {
             console.log('Argument should be a number')
             return
         }
         const user = await createUser(Number(str))
-        console.log(user)
+        const fleet = await createFleet(user.id)
+        console.log('Fleet id: ', fleet.id)
     })
 
 program
@@ -57,8 +54,16 @@ program
     .description('Register a vehicule to a fleet')
     .argument('<fleetId>', 'fleet id')
     .argument('<vehiculePlateNumber>', 'vehicule plate number')
-    .action((arg1, arg2) => {
-        console.log(arg1, arg2)
+    .action(async (fleetId, plateNumber) => {
+        if (Number.isNaN(Number(fleetId))) {
+            console.log('1st argument (fleet id) should be of type number')
+            return
+        }
+        const fleet = await registerVehiculeToFleet(
+            Number(fleetId),
+            plateNumber
+        )
+        console.log(fleet)
     })
 
 program
@@ -66,8 +71,29 @@ program
     .description('Localize a vehicule')
     .argument('<fleetId>', 'fleet id')
     .argument('<vehiculePlateNumber>', 'vehicule plate number')
-    .action((arg1, arg2) => {
-        console.log(arg1, arg2)
+    .argument('<latitude>', 'latitude')
+    .argument('<longitude>', 'longitude')
+    .action(async (fleetId, plateNumber, lat, lon) => {
+        if (Number.isNaN(Number(fleetId))) {
+            console.log('1st argument (fleet id) should be of type number')
+            return
+        }
+        const latitudeReg = new RegExp(
+            /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/
+        )
+        const longitudeReg = new RegExp(
+            /^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/
+        )
+        if (!latitudeReg.test(lat) || !longitudeReg.test(lon)) {
+            console.log('Check longitude and latitude failed')
+            return
+        }
+        const vehicule = await parkVehicule(plateNumber, {
+            latitude: lat,
+            longitude: lon,
+        })
+
+        console.log(vehicule)
     })
 
 program.parse()

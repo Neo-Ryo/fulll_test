@@ -1,8 +1,15 @@
-# Requirements
-To run this project you will need a computer with Node, Typescript and Cucumber installed.
+# SETUP
 
-# Install
-To install the project, you just have to run `yarn install` to get all the dependencies
+Make sure to be in the `Boilerplate/` folder and:
 
-# Running the tests
-After installing the dependencies you can run the tests with this command `yarn test`.
+-   Run `yarn install`.
+-   Run `cp .env.example .env` (no need to change anything)
+-   Run `npx prisma migrate dev --name init --schema=src/Infra/prisma/schema.prisma`.
+-   And finally `yarn build`
+
+You ready to use the project now.
+
+## Things you can do
+
+-   Run `yarn test` to check the scenarii running
+-   Run `node ./fleet.js <args>` to use the CLI
