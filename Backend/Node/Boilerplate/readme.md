@@ -4,7 +4,7 @@ Make sure to be in the `Boilerplate/` folder and:
 
 -   Run `yarn install`.
 -   Run `cp .env.example .env` (no need to change anything)
--   Run `npx prisma migrate dev --name init --schema=src/Infra/prisma/schema.prisma`.
+-   Run `yarn prisma:migrate`.
 -   And finally `yarn build`
 
 You ready to use the project now.
@@ -12,4 +12,8 @@ You ready to use the project now.
 ## Things you can do
 
 -   Run `yarn test` to check the scenarii running
--   Run `node ./fleet.js <args>` to use the CLI
+-   Use the fleet CLI:
+
+    -   Run `node ./fleet.js create <Number>`
+    -   Run `node ./fleet register-vehicle <fleetId> <vehiclePlateNumber>`
+    -   Run `node ./fleet localize-vehicle <fleetId> <vehiclePlateNumber> <lat> <lng>`

@@ -12,7 +12,8 @@
     },
     "scripts": {
         "build": "npx tsc",
-        "test": "npx tsc && cucumber-js --profile default"
+        "test": "npx tsc && cucumber-js --profile default",
+        "prisma:migrate": "npx prisma migrate dev --name init --schema=src/Infra/prisma/schema.prisma"
     },
     "dependencies": {
         "@prisma/client": "5.9.1",

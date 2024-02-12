@@ -29,10 +29,10 @@ program
     })
 
 program
-    .command('register-vehicule')
-    .description('Register a vehicule to a fleet')
+    .command('register-vehicle')
+    .description('Register a vehicle to a fleet')
     .argument('<fleetId>', 'fleet id')
-    .argument('<vehiculePlateNumber>', 'vehicule plate number')
+    .argument('<vehiclePlateNumber>', 'vehicule plate number')
     .action(async (fleetId, plateNumber) => {
         if (Number.isNaN(Number(fleetId))) {
             console.log('1st argument (fleet id) should be of type number')
@@ -47,9 +47,9 @@ program
 
 program
     .command('localize-vehicle')
-    .description('Localize a vehicule')
+    .description('Localize a vehicle')
     .argument('<fleetId>', 'fleet id')
-    .argument('<vehiculePlateNumber>', 'vehicule plate number')
+    .argument('<vehiclePlateNumber>', 'vehicule plate number')
     .argument('<latitude>', 'latitude')
     .argument('<longitude>', 'longitude')
     .action(async (fleetId, plateNumber, lat, lon) => {
