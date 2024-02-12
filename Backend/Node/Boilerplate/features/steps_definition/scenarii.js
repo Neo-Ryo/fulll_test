@@ -1,5 +1,5 @@
 const assert = require('assert')
-const { Given, When, Then, BeforeAll } = require('@cucumber/cucumber')
+const { Given, When, Then, BeforeAll, AfterAll } = require('@cucumber/cucumber')
 const { prisma } = require('../../build/prisma')
 const {
     createFleet,
@@ -12,6 +12,12 @@ const {
 } = require('../../build/App/controllers/vehiculeController')
 
 BeforeAll(async () => {
+    await prisma.fleet.deleteMany()
+    await prisma.vehicule.deleteMany()
+    await prisma.user.deleteMany()
+})
+
+AfterAll(async () => {
     await prisma.fleet.deleteMany()
     await prisma.vehicule.deleteMany()
     await prisma.user.deleteMany()

@@ -1,32 +1,11 @@
 const fs = require('fs')
 const { Command } = require('commander')
 const { createUser } = require('./build/App/controllers/userController')
-const {
-    createVehicule,
-    parkVehicule,
-} = require('./build/App/controllers/vehiculeController')
+const { parkVehicule } = require('./build/App/controllers/vehiculeController')
 const {
     createFleet,
     registerVehiculeToFleet,
 } = require('./build/App/controllers/fleetController')
-
-// const pathToFleetController = 'build/App/controllers/fleetController.js'
-// const pathToUserController = 'build/App/controllers/userController.js'
-// const pathToVehiculeController = 'build/App/controllers/vehiculeController.js'
-
-// function checkBuildFolder() {
-//     if (!fs.existsSync('build/')) {
-//         return false
-//     }
-//     const filesExists =
-//         fs.existsSync(pathToUserController) &&
-//         fs.existsSync(pathToFleetController) &&
-//         fs.existsSync(pathToVehiculeController)
-//     if (!filesExists) {
-//         return false
-//     }
-//     return true
-// }
 
 const program = new Command()
 
